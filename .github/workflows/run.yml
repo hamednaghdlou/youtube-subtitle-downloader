@@ -1,1 +1,42 @@
+name: Run YouTube Subtitle Downloader
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Show help
+        run: python youtubesub.py -h
+
+      - name: List available languages
+        run: python youtubesub.py -l
+
+      - name: Run subtitle download test
+        run: |
+          python youtubesub.py --filename subtitle --language en --filetype srt "http://www.youtube.com/watch?v=5MgBikgcWnY"
+
+      - name: Upload generated files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: subtitles-output
+          path: |
+            *.srt
+            *.xml
 
